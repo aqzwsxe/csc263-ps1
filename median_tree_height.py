@@ -32,22 +32,17 @@ def get_higher_middle(li: list) -> int:
 
 def max_heap_helper(ne: list, i: int): # the root is at ne[0]
     temp = 2 * i + 1
-    if i < len(ne):
-        if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
-            if max(ne[temp], ne[temp] + 1) > ne[i]:
-
-                if ne[temp] > ne[temp+ 1]:
-                    ne[i], ne[temp] = ne[temp], ne[i]
-                    return
-                else:
-                    ne[i], ne[temp + 1] = ne[temp+1], ne[i]
-                    return
-        if temp < len(ne):
-            if ne[temp] > ne[i]:
-                ne[temp], ne[i] = ne[i], ne[temp]
-                return
+    if temp >= len(ne):
+        return None
+    elif temp + 1 >= len(ne):
+        if ne[temp] > ne[i]:
+            ne[temp], ne[i] = ne[i], ne[temp]
+    else:
         max_heap_helper(ne, temp)
-        min_heap_helper(ne, temp + 1)
+        max_heap_helper(ne, temp + 1)
+        if (max(ne[temp], ne[temp+1])) > ne[i]:
+            if ne[temp] > ne[temp+1]:
+                ne[i], ne[temp] = ne[temp], ne[i]
 
 
 def min_heap_helper(ne: list, i: int): # the root is at ne[0]
@@ -145,5 +140,4 @@ if __name__ == '__main__':
      'insert 19',
      'insert 3',
      ], 9)
-
 
