@@ -19,9 +19,10 @@ def median_tree_height(commands, middle) -> list:
     result = [middle]
     for i in commands[1:]:
         insert_value = int(i[7:])
-        left_right_heap = insert(middle, left_right_heap)
-        middle = left_right_heap[2]
+        l_r_heap = insert(middle, left_right_heap, insert_value)
+        middle = l_r_heap[2]
         result.append(middle)
+    print(result)
     return result
 
 
@@ -30,41 +31,38 @@ def get_higher_middle(li: list) -> int:
 
 
 def max_heap_helper(ne: list, i: int): # the root is at ne[0]
-    temp = 2*(i + 2)
-    if i < len(ne):
-        if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
-            if max(ne[temp], ne[temp + 1]) > ne[i]:
+    temp = 2*(i + 1)
+    for i in range(len(ne)):
+        if i < len(ne):
+            if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
+                print(ne[0])
+                if max(ne[temp], ne[temp + 1]) > ne[i]:
 
-                if ne[temp] > ne[temp + 1]:
-                    ne[i], ne[temp] = ne[temp], ne[i]
-                else:
-                    ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
+                    if ne[temp] > ne[temp + 1]:
+                        ne[i], ne[temp] = ne[temp], ne[i]
+                    else:
+                        ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
-        if temp < len(ne):
-            if ne[temp] > ne[i]:
-                ne[temp], ne[i] = ne[i], ne[temp]
-
-    max_heap_helper(ne, temp)
-    max_heap_helper(ne, temp + 1)
+            if temp < len(ne):
+                if ne[temp] > ne[i]:
+                    ne[temp], ne[i] = ne[i], ne[temp]
 
 
 def min_heap_helper(ne: list, i: int): # the root is at ne[0]
-    temp = 2 * (i + 2)
-    if i < len(ne):
-        if temp < len(ne) and temp + 1 < len(ne):  # it has both left and right child
-            if min(ne[temp], ne[temp + 1]) > ne[i]:
+    temp = 2 * (i + 1)
+    for i in range(len(ne)):
+        if i < len(ne):
+            if temp < len(ne) and temp + 1 < len(ne):  # it has both left and right child
+                if min(ne[temp], ne[temp + 1]) > ne[i]:
 
-                if ne[temp] < ne[temp + 1]:
-                    ne[i], ne[temp] = ne[temp], ne[i]
-                else:
-                    ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
+                    if ne[temp] < ne[temp + 1]:
+                        ne[i], ne[temp] = ne[temp], ne[i]
+                    else:
+                        ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
-        if temp < len(ne): # only have the left child
-            if ne[temp] < ne[i]:
-                ne[temp], ne[i] = ne[i], ne[temp]
-
-    min_heap_helper(ne, temp)
-    min_heap_helper(ne, temp + 1)
+            if temp < len(ne): # only have the left child
+                if ne[temp] < ne[i]:
+                    ne[temp], ne[i] = ne[i], ne[temp]
 
 
 def initialize(data: str, middle: int) -> list:
@@ -74,28 +72,34 @@ def initialize(data: str, middle: int) -> list:
     greater = []
     total = []
     for i in li: # O(n)
-        num = int[i]
-        if num <= middle:
-            less.append(i)
+
+        num = int(i)
+        if num < middle:
+            less.append(num)
         else:
-            greater.append(i)
+            greater.append(num)
 
     max_heap_helper(less, 0)
     min_heap_helper(greater, 0)
     total.append(less)
-    total.append(middle)
     total.append(greater)
-    return new
+    total.append(middle)
+
+    return total
 
 
-def insert(median: int, r: list) -> list:
+def insert(median: int, r: list, insert_value: int) -> list:
 
-    left_heap = list[0]
-    right_heap = list[2]
-    length = len(left_heap) + len(right_heap) + 1
+    left_heap = r[0]
+
+    right_heap = r[1]
+
+    length = len(list(left_heap)) + len(list(right_heap)) + 1
 
     if length % 2 == 0:
         if len(left_heap) == len(right_heap):
+            print(left_heap[0] / 2)
+
             new_mid = round((median + left_heap[0])/2)
         else:
             new_mid = round((median + right_heap[0])/2)
