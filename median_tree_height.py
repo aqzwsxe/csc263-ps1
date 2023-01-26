@@ -30,40 +30,45 @@ def get_higher_middle(li: list) -> int:
     return li[-1]
 
 
-def max_heap_helper(ne: list): # the root is at ne[0]
+def max_heap_helper(ne: list, i: int): # the root is at ne[0]
+    temp = 2 * i + 1
+    if i < len(ne):
+        if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
+            if max(ne[temp], ne[temp] + 1) > ne[i]:
 
-    for i in range(len(ne)):
-        temp = 2 * i + 1
-        if i < len(ne):
-            if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
-                if max(ne[temp], ne[temp] + 1) > ne[i]:
-
-                    if ne[temp] > ne[temp+ 1]:
-                        ne[i], ne[temp] = ne[temp], ne[i]
-                    else:
-                        ne[i], ne[temp + 1] = ne[temp+1], ne[i]
-
-            if temp < len(ne):
-                if ne[temp] > ne[i]:
-                    ne[temp], ne[i] = ne[i], ne[temp]
+                if ne[temp] > ne[temp+ 1]:
+                    ne[i], ne[temp] = ne[temp], ne[i]
+                    return
+                else:
+                    ne[i], ne[temp + 1] = ne[temp+1], ne[i]
+                    return
+        if temp < len(ne):
+            if ne[temp] > ne[i]:
+                ne[temp], ne[i] = ne[i], ne[temp]
+                return
+        max_heap_helper(ne, temp)
+        min_heap_helper(ne, temp + 1)
 
 
-def min_heap_helper(ne: list): # the root is at ne[0]
+def min_heap_helper(ne: list, i: int): # the root is at ne[0]
 
-    for i in range(len(ne)):
-        temp = 2 * i + 1
-        if i < len(ne):
-            if temp < len(ne) and temp+1 < len(ne):  # it has both left and right child
-                if min(ne[temp], ne[temp+1]) < ne[i]:
+    temp = 2 * i + 1
+    if i < len(ne):
+        if temp < len(ne) and temp+1 < len(ne):  # it has both left and right child
+            if min(ne[temp], ne[temp+1]) < ne[i]:
+                if ne[temp] < ne[temp+1]:
+                    ne[i], ne[temp] = ne[temp], ne[i]
+                    return
+                else:
+                    ne[i], ne[temp+1] = ne[temp+1], ne[i]
+                    return
 
-                    if ne[temp] < ne[temp+1]:
-                        ne[i], ne[temp] = ne[temp], ne[i]
-                    else:
-                        ne[i], ne[temp+1] = ne[temp+1], ne[i]
-
-            if temp < len(ne): # only have the left child
-                if ne[temp] < ne[i]:
-                    ne[temp], ne[i] = ne[i], ne[temp]
+        if temp < len(ne): # only have the left child
+            if ne[temp] < ne[i]:
+                ne[temp], ne[i] = ne[i], ne[temp]
+                return
+        min_heap_helper(ne, temp)
+        min_heap_helper(ne, temp+1)
 
 
 def initialize(data: str, middle: int) -> list:
@@ -81,8 +86,8 @@ def initialize(data: str, middle: int) -> list:
             greater.append(num)
         else:
             continue
-    max_heap_helper(less)
-    min_heap_helper(greater)
+    max_heap_helper(less, 0)
+    min_heap_helper(greater, 0)
     total.append(less)
     total.append(greater)
     total.append(middle)
@@ -98,10 +103,10 @@ def insert(median: int, r: list, insert_value: int) -> list:
 
     if insert_value < median:
         left_heap.append(insert_value)
-        max_heap_helper(left_heap)
+        max_heap_helper(left_heap, 0)
     else:
         right_heap.append(insert_value)
-        min_heap_helper(right_heap)
+        min_heap_helper(right_heap, 0)
 
     length = len(list(left_heap)) + len(list(right_heap)) + 1
 
@@ -124,8 +129,8 @@ def insert(median: int, r: list, insert_value: int) -> list:
     else:
         right_heap.append(median)
     median = new_mid
-    max_heap_helper(left_heap)
-    min_heap_helper(right_heap)
+    max_heap_helper(left_heap, 0)
+    min_heap_helper(right_heap, 0)
 
     return [left_heap, right_heap, median]
 
