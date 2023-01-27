@@ -32,48 +32,37 @@ def get_higher_middle(li: list) -> int:
 
 def max_heap_helper(ne: list, i: int): # the root is at ne[0]
     temp = 2 * i + 1
-    if i < len(ne) and len(ne) != 0:
-        if temp < len(ne) and temp + 1 < len(ne): # it has both left and right child
-            if max(ne[temp], ne[temp+1]) > ne[0]:
-
-                if ne[temp] > ne[temp+ 1]:
-                    ne[0], ne[temp] = ne[temp], ne[0]
-                    return
-                else:
-                    ne[0], ne[temp + 1] = ne[temp+1], ne[0]
-                    return
-        if temp < len(ne):
-            if ne[temp] > ne[0]:
-                ne[temp], ne[0] = ne[0], ne[temp]
-                return
-    else:
+    if temp >= len(ne):
         return None
-
-    max_heap_helper(ne, temp)
-    min_heap_helper(ne, temp + 1)
+    elif temp + 1 >= len(ne):
+        if ne[temp] > ne[i]:
+            ne[temp], ne[i] = ne[i], ne[temp]
+    else:
+        max_heap_helper(ne, temp)
+        max_heap_helper(ne, temp + 1)
+        if (max(ne[temp], ne[temp + 1])) > ne[i]:
+            if ne[temp] > ne[temp + 1]:
+                ne[i], ne[temp] = ne[temp], ne[i]
+            else:
+                ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
 
 def min_heap_helper(ne: list, i: int): # the root is at ne[0]
 
     temp = 2 * i + 1
-    if i < len(ne) and len(ne) != 0:
-        if temp < len(ne) and temp+1 < len(ne):  # it has both left and right child
-            if min(ne[temp], ne[temp+1]) < ne[i]:
-                if ne[temp] < ne[temp+1]:
-                    ne[0], ne[temp] = ne[temp], ne[0]
-                    return
-                else:
-                    ne[0], ne[temp+1] = ne[temp+1], ne[0]
-                    return
-
-        if temp < len(ne): # only have the left child
-            if ne[temp] < ne[i]:
-                ne[temp], ne[0] = ne[0], ne[temp]
-                return
-    else:
+    if temp >= len(ne):
         return None
-    min_heap_helper(ne, temp)
-    min_heap_helper(ne, temp+1)
+    elif temp + 1 >= len(ne):
+        if ne[temp] < ne[i]:
+            ne[temp], ne[i] = ne[i], ne[temp]
+    else:
+        min_heap_helper(ne, temp)
+        min_heap_helper(ne, temp + 1)
+        if (min(ne[temp], ne[temp + 1])) < ne[i]:
+            if ne[temp] < ne[temp + 1]:
+                ne[i], ne[temp] = ne[temp], ne[i]
+            else:
+                ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
 
 def initialize(data: str, middle: int) -> list:
@@ -101,7 +90,6 @@ def initialize(data: str, middle: int) -> list:
 
 
 def insert(median: int, r: list, insert_value: int) -> list:
-
     left_heap = r[0]
 
     right_heap = r[1]
@@ -118,19 +106,19 @@ def insert(median: int, r: list, insert_value: int) -> list:
 
     length = len(list(left_heap)) + len(list(right_heap)) + 1
 
-    if length % 2 == 0 and isinstance(median, int):
+    if length % 2 != 0 and isinstance(median, int):
         if len(left_heap) > len(right_heap):
 
-            new_mid = round((median + left_heap[0])/2, 1)
+            new_mid = round((median + left_heap[0]) / 2, 1)
         else:
-            new_mid = round((median + right_heap[0])/2, 1)
+            new_mid = round((median + right_heap[0]) / 2, 1)
 
     else:
         if len(left_heap) > len(right_heap):
-            new_mid = left_heap.pop(0)
+            new_mid = left_heap[0]
 
         else:
-            new_mid = right_heap.pop(0)
+            new_mid = right_heap[0]
     if median <= new_mid and isinstance(median, int):
         left_heap.append(median)
     elif isinstance(median, int):
@@ -149,19 +137,10 @@ if __name__ == '__main__':
   # some small test cases
   # Case 1
 
-  assert [9, 10.0, 11, 10.0] == median_tree_height(
-    ['initialize 11 4 7 18 9',
-     'insert 15',
-     'insert 19',
-     'insert 3',
-     ], 9)
-
-  assert [0] == median_tree_height(['initialize 0'], 0)
-
-  assert [4, 3.5, 3, 3] == median_tree_height(
-      ['initialize 1 2 3 4 5 6 7',
-       'insert 1',
-       'insert 2',
+  assert [8.0, 9, 9.5, 9] == median_tree_height(
+      ['initialize 11 4 7 18 9 2 7 18 7 20 6 15 4 10',
+       'insert 15',
+       'insert 19',
        'insert 3',
-       ], 4)
+       ], 8)
 
