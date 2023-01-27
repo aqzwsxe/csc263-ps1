@@ -16,12 +16,33 @@ def median_tree_height(commands, middle) -> list:
     Post: return list of outputs
     '''
     left_right_heap = initialize(commands[0], middle)
+    less = left_right_heap[0]
+    greater = left_right_heap[1]
+
     result = [middle]
     for i in commands[1:]:
+        mem = []
+
         insert_value = int(i[7:])
-        l_r_heap = insert(middle, left_right_heap, insert_value)
-        middle = l_r_heap[2]
+        for i in less:
+            if i >= middle:
+                greater.append(i)
+                mem.append(i)
+        for i in greater:
+            if i < middle:
+                less.append(i)
+                mem.append(i)
+        for i in mem:
+            less.remove(i)
+            greater.remove(i)
+        max_heap_helper(less, 0)
+        min_heap_helper(greater, 0)
+
+
+        insert(middle, left_right_heap, insert_value)
+        middle = left_right_heap[2]
         result.append(middle)
+
     print(result)
     return result
 
@@ -40,30 +61,29 @@ def max_heap_helper(ne: list, i: int): # the root is at ne[0]
     else:
         max_heap_helper(ne, temp)
         max_heap_helper(ne, temp + 1)
-        if (max(ne[temp], ne[temp+1])) > ne[i]:
-            if ne[temp] > ne[temp+1]:
+        if (max(ne[temp], ne[temp + 1])) > ne[i]:
+            if ne[temp] > ne[temp + 1]:
                 ne[i], ne[temp] = ne[temp], ne[i]
+            else:
+                ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
 
 def min_heap_helper(ne: list, i: int): # the root is at ne[0]
 
     temp = 2 * i + 1
-    if i < len(ne):
-        if temp < len(ne) and temp+1 < len(ne):  # it has both left and right child
-            if min(ne[temp], ne[temp+1]) < ne[i]:
-                if ne[temp] < ne[temp+1]:
-                    ne[i], ne[temp] = ne[temp], ne[i]
-                    return
-                else:
-                    ne[i], ne[temp+1] = ne[temp+1], ne[i]
-                    return
-
-        if temp < len(ne): # only have the left child
-            if ne[temp] < ne[i]:
-                ne[temp], ne[i] = ne[i], ne[temp]
-                return
+    if temp >= len(ne):
+        return None
+    elif temp + 1 >= len(ne):
+        if ne[temp] < ne[i]:
+            ne[temp], ne[i] = ne[i], ne[temp]
+    else:
         min_heap_helper(ne, temp)
-        min_heap_helper(ne, temp+1)
+        min_heap_helper(ne, temp + 1)
+        if (min(ne[temp], ne[temp + 1])) < ne[i]:
+            if ne[temp] < ne[temp + 1]:
+                ne[i], ne[temp] = ne[temp], ne[i]
+            else:
+                ne[i], ne[temp + 1] = ne[temp + 1], ne[i]
 
 
 def initialize(data: str, middle: int) -> list:
@@ -73,7 +93,7 @@ def initialize(data: str, middle: int) -> list:
     greater = []
     total = []
     for i in li: # O(n)
-
+        print(int(i))
         num = int(i)
         if num < middle:
             less.append(num)
@@ -92,52 +112,88 @@ def initialize(data: str, middle: int) -> list:
 
 def insert(median: int, r: list, insert_value: int) -> list:
 
-    left_heap = r[0]
+    less = r[0]
 
-    right_heap = r[1]
+    greater = r[1]
 
     if insert_value < median:
-        left_heap.append(insert_value)
-        max_heap_helper(left_heap, 0)
+        less.append(insert_value)
+        max_heap_helper(less, 0)
+    elif insert_value == median:
+        less.append(insert_value)
+        max_heap_helper(greater, 0)
     else:
-        right_heap.append(insert_value)
-        min_heap_helper(right_heap, 0)
+        greater.append(insert_value)
+        min_heap_helper(greater, 0)
 
-    length = len(list(left_heap)) + len(list(right_heap)) + 1
+    length = len(list(less)) + len(list(greater)) + 1
 
-    if length % 2 == 0:
-        if len(left_heap) == len(right_heap):
-            print(left_heap[0] / 2)
-
-            new_mid = round((median + left_heap[0])/2, 1)
+    if length % 2 == 0 and isinstance(median, int):
+        if len(less) >= len(greater):
+            max_heap_helper(less, 0)
+            new_mid = round((median + less[0])/2, 1)
         else:
-            new_mid = round((median + right_heap[0])/2, 1)
+
+            min_heap_helper(greater, 0)
+            new_mid = round((median + greater[0])/2, 1)
 
     else:
-        if len(left_heap) > len(right_heap):
-            new_mid = left_heap.pop(0)
+        if len(less) > len(greater):
+            new_mid = less.pop(0)
 
         else:
-            new_mid = right_heap.pop(0)
-    if median <= new_mid:
-        left_heap.append(median)
+            new_mid = greater.pop(0)
+    if median < new_mid and isinstance(median, int):
+        less.append(median)
+    elif isinstance(median, int):
+        greater.append(median)
     else:
-        right_heap.append(median)
+        pass
     median = new_mid
-    max_heap_helper(left_heap, 0)
-    min_heap_helper(right_heap, 0)
+    r[2] = new_mid
+    max_heap_helper(less, 0)
+    min_heap_helper(greater, 0)
 
-    return [left_heap, right_heap, median]
+    return [less, greater, median]
 
 
 if __name__ == '__main__':
   # some small test cases
   # Case 1
 
-  assert [9, 10.0, 11, 10.0] == median_tree_height(
-    ['initialize 11 4 7 18 9',
-     'insert 15',
-     'insert 19',
-     'insert 3',
-     ], 9)
+      assert [9, 10.0, 11, 10.0] == median_tree_height(
+        ['initialize 11 4 7 18 9',
+         'insert 15',
+         'insert 19',
+         'insert 3',
+         ], 9)
 
+      assert [0] == median_tree_height(['initialize 0'], 0)
+
+      assert [4, 3.5, 3, 3.0] == median_tree_height(
+          ['initialize 1 2 3 4 5 6 7',
+           'insert 1',
+           'insert 2',
+           'insert 3',
+           ], 4)
+
+      assert [8.0, 9, 9.5, 9] == median_tree_height(
+          ['initialize 11 4 7 18 9 2 7 18 7 20 6 15 4 10',
+           'insert 15',
+           'insert 19',
+           'insert 3',
+           ], 8.0)
+
+      assert[11.5, 10, 9.5, 9] == median_tree_height(
+        ['initialize 2 7 9 10 77 28 9 1 4 13 7 18 26 30 54 32',
+         'insert 4',
+         'insert 7',
+         'insert 3',
+         ], 11.5)
+
+      assert[11.5, 13, 15.5, 13] == median_tree_height(
+      ['initialize 2 7 9 10 77 28 9 1 4 13 7 18 26 30 54 32',
+       'insert 44',
+       'insert 77',
+       'insert 3',
+      ], 11.5)
