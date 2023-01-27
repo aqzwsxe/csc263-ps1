@@ -16,12 +16,33 @@ def median_tree_height(commands, middle) -> list:
     Post: return list of outputs
     '''
     left_right_heap = initialize(commands[0], middle)
+    less = left_right_heap[0]
+    greater = left_right_heap[1]
+
     result = [middle]
     for i in commands[1:]:
+        mem = []
+
         insert_value = int(i[7:])
+        for i in less:
+            if i >= middle:
+                greater.append(i)
+                mem.append(i)
+        for i in greater:
+            if i < middle:
+                less.append(i)
+                mem.append(i)
+        for i in mem:
+            less.remove(i)
+            greater.remove(i)
+        max_heap_helper(less, 0)
+        min_heap_helper(greater, 0)
+
+
         insert(middle, left_right_heap, insert_value)
         middle = left_right_heap[2]
         result.append(middle)
+
     print(result)
     return result
 
@@ -90,57 +111,75 @@ def initialize(data: str, middle: int) -> list:
 
 
 def insert(median: int, r: list, insert_value: int) -> list:
-    left_heap = r[0]
 
-    right_heap = r[1]
+    less = r[0]
+
+    greater = r[1]
 
     if insert_value < median:
-        left_heap.append(insert_value)
-        max_heap_helper(left_heap, 0)
+        less.append(insert_value)
+        max_heap_helper(less, 0)
     elif insert_value == median:
-        right_heap.append(insert_value)
-        min_heap_helper(right_heap, 0)
+        less.append(insert_value)
+        max_heap_helper(greater, 0)
     else:
-        right_heap.append(insert_value)
-        min_heap_helper(right_heap, 0)
+        greater.append(insert_value)
+        min_heap_helper(greater, 0)
 
-    length = len(list(left_heap)) + len(list(right_heap)) + 1
+    length = len(list(less)) + len(list(greater)) + 1
 
-    if length % 2 != 0 and isinstance(median, int):
-        if len(left_heap) > len(right_heap):
-
-            new_mid = round((median + left_heap[0]) / 2, 1)
+    if length % 2 == 0 and isinstance(median, int):
+        if len(less) >= len(greater):
+            max_heap_helper(less, 0)
+            new_mid = round((median + less[0])/2, 1)
         else:
-            new_mid = round((median + right_heap[0]) / 2, 1)
+
+            min_heap_helper(greater, 0)
+            new_mid = round((median + greater[0])/2, 1)
 
     else:
-        if len(left_heap) > len(right_heap):
-            new_mid = left_heap[0]
+        if len(less) > len(greater):
+            new_mid = less.pop(0)
 
         else:
-            new_mid = right_heap[0]
-    if median <= new_mid and isinstance(median, int):
-        left_heap.append(median)
+            new_mid = greater.pop(0)
+    if median < new_mid and isinstance(median, int):
+        less.append(median)
     elif isinstance(median, int):
-        right_heap.append(median)
+        greater.append(median)
     else:
         pass
     median = new_mid
     r[2] = new_mid
-    max_heap_helper(left_heap, 0)
-    min_heap_helper(right_heap, 0)
+    max_heap_helper(less, 0)
+    min_heap_helper(greater, 0)
 
-    return [left_heap, right_heap, median]
+    return [less, greater, median]
 
 
 if __name__ == '__main__':
   # some small test cases
   # Case 1
 
-  assert [8.0, 9, 9.5, 9] == median_tree_height(
-      ['initialize 11 4 7 18 9 2 7 18 7 20 6 15 4 10',
-       'insert 15',
-       'insert 19',
-       'insert 3',
-       ], 8)
+      assert [9, 10.0, 11, 10.0] == median_tree_height(
+        ['initialize 11 4 7 18 9',
+         'insert 15',
+         'insert 19',
+         'insert 3',
+         ], 9)
 
+      assert [0] == median_tree_height(['initialize 0'], 0)
+
+      assert [4, 3.5, 3, 3.0] == median_tree_height(
+          ['initialize 1 2 3 4 5 6 7',
+           'insert 1',
+           'insert 2',
+           'insert 3',
+           ], 4)
+
+      assert [8.0, 9, 9.5, 10] == median_tree_height(
+          ['initialize 11 4 7 18 9 2 7 18 7 20 6 15 4 10',
+           'insert 15',
+           'insert 19',
+           'insert 13',
+           ], 8.0)
