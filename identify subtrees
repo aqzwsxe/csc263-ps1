@@ -1,5 +1,5 @@
 class TreeNode:
-    def __init__(self, val=0):
+    def __init__(self, val=0.0):
         self.val = val
         self.left = None
         self.right = None
@@ -15,9 +15,11 @@ def identify(node: TreeNode):
     else:
         if node.left.val > node.right.val:
             node.left, node.right = node.right, node.left
-            return node.right, node.left
+            return {node.right.val: node.right, node.left.val: node.left}
         else:
-            return identify(node.left) if identify(node.left) is not None else identify(node.right)
+            p = identify(node.left)
+            q = identify(node.right)
+            return p if p is not None else q
 
 
 if __name__ == '__main__':
@@ -26,7 +28,9 @@ if __name__ == '__main__':
     node2 = TreeNode(4)
     node.left = node1
     node.right = node2
-    node1.left = TreeNode(5)
-    node1.right = TreeNode(1)
+    node2.left = TreeNode(3.5)
+    node2.right = TreeNode(6)
+    node2.left = TreeNode(3.7)
+    node2.right = TreeNode(3.1)
     p = identify(node)
     print(p)
